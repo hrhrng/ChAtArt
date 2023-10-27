@@ -10,7 +10,8 @@ http拦截器,用于拦截openai的请求,并将请求转发到qunar的接口
 qunar_data_t = {
     "key": "yangx.xiao",
     "password": "123456",
-    "apiType": "gpt-35-turbo"
+    "apiType": "gpt-35-turbo",
+    "prompt":{}
 }
 
 original_request = None
@@ -20,11 +21,11 @@ original_request = None
 async def new_request(self, method, url, **kwargs):
     print(f"Intercepted request: {method} {url}")
     tmstmp = int(time.time())
-    if method == "post" and url == "https://api.openai.com/v1/chat/completions":
+    if method == "post" and url == "https://api.openai-hk.com/v1/chat/completions":
         data_s = kwargs.get('data')
         data = json.loads(data_s)
         qunar_data = copy.copy(qunar_data_t)
-        qunar_data['prompt']['message'] = data['message']
+        qunar_data['prompt']['messages'] = data['messages']
         qunar_data_s = json.dumps(qunar_data)
         url = "qunar.com"
         kwargs['data'] = qunar_data_s
