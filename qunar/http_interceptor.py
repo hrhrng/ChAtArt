@@ -23,6 +23,7 @@ async def new_request(self, method, url, **kwargs):
     tmstmp = int(time.time())
     if method == "post" and url == "https://api.openai-hk.com/v1/chat/completions":
         data_s = kwargs.get('data')
+        print(data_s)
         data = json.loads(data_s)
         qunar_data = copy.copy(qunar_data_t)
         qunar_data['prompt']['messages'] = data['messages']
@@ -70,6 +71,8 @@ def build_choices(qunar_d):
     choice['index'] = 0
     choice['finish_reason'] = finish_reason
     return [choice]
+
+
 
 
 def init():
