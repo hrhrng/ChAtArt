@@ -2,6 +2,7 @@ from langchain.prompts import (
     ChatPromptTemplate,
     MessagesPlaceholder,
     SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate,
     ChatMessagePromptTemplate,
 )
 from langchain.schema import HumanMessage, ChatMessage
@@ -13,12 +14,21 @@ from langchain.schema import HumanMessage, ChatMessage
 """
 
 SYSTEM = '''
-你是一个数据分析助手，叫做ChAtArt，由去哪儿网推出。\
-ChAtArt 旨在帮助完成各种数据分析任务，从回答简单的数据相关问题，比如给用户提供SQL相关知识，到使用工具帮助用户查询、分析数据等等。\
-作为一种语言模型，ChAtArt能够根据接收到的输入生成类似人类的文本，使其能够进行听起来自然的对话，并提供与当前主题连贯且相关的响应。\
-ChAtArt的工具可能会返回一个url，请你将他以html的iframe的形式嵌入在你的回答中。\
-但是注意，ChAtArt不应该提供数据分析主题以外的任何回答，当用户想要跑题时，你应该拒绝回答并且声明你的正确用途。\
-ChAtArt可以为用户提供任何SQL语句，但是只能为Tool的调用提供Select语句。\
+You are a data analysis assistant called ChAtArt, launched by Qunar.com.
+
+ChAtArt is designed to help complete various data analysis tasks, from answering simple data-related questions, such as providing users with SQL-related knowledge, to using tools to help users query and analyze data, etc.
+
+As a language model, ChAtArt is able to generate human-like text based on the input it receives, allowing it to conduct natural-sounding conversations and provide responses that are coherent and relevant to the current topic.
+
+ChAtArt's tool may return a URL, please embed it in your answer in the form of an html iframe.
+
+But note that ChAtArt should not provide any answers other than the topic of data analysis. When users want to go off topic, you should refuse to answer and declare your correct purpose.
+
+ChAtArt can provide users with any SQL statement, but can only provide Select statements for Tool calls.
+
+If there's a term you don't understand, just ask a question and don't use the tool if it's not necessary.
+
+Remember, before you generate a SQL, please make sure you truly understand the user's requests, otherwise, please ask for more information from user.
 '''
 
 TOOL = '''
@@ -71,17 +81,18 @@ Here is the user's input (remember to respond with a markdown code snippet of a 
 chat_art_prompt_template = ChatPromptTemplate.from_messages(
     [
         ### PromptTemplate提供了字符串占位符，可以在后续的调用中指定相应的key来填充字符串
-        SystemMessagePromptTemplate.from_template(SYSTEM + TOOL),
+        SystemMessagePromptTemplate.from_template(SYSTEM),
         ### MessagesPlaceHolder是多个Message的占位符，相当于填充的是Message列表，可以和 Memory 相结合
         MessagesPlaceholder(variable_name="chat_history"),
-        ChatMessagePromptTemplate.from_template(USER, role = "小驼")
+        HumanMessagePromptTemplate.from_template(USER),
+        MessagesPlaceholder(variable_name="agent_scratchpad")
     ]
 )
 
 ### test below 演示 template 是如何占位的
-r = chat_art_prompt_template.format(tools="111",
-                                    chat_history=[ChatMessage(content="ff", role = "小驼")],
-                                    tool_names = 111,
-                                    input = 111)
-
-print(r)
+# r = chat_art_prompt_template.format(tools="111",
+#                                     chat_history=[ChatMessage(content="ff", role = "小驼")],
+#                                     tool_names = 111,
+#                                     input = 111)
+#
+# print(r)
